@@ -5,7 +5,7 @@ services:
   web:
     build: ./web
     environment:
-      - APACHE_RUN_USER=sasha534
+      - APACHE_RUN_USER=www-data
     volumes:
       - ${APP_PATH_HOST}:${APP_PATH_CONTAINER}
     ports:
@@ -13,14 +13,12 @@ services:
     working_dir: ${APP_PATH_CONTAINER}
 
   db:
-    image: bitnami/mariadb:10.1
+    image: mariadb
     restart: always
     environment:
       MARIADB_ROOT_PASSWORD: 123456
     ports:
-      - 3308:3309
-    volumes:
-      - ${DB_PATH_HOST}:/var/lib/mysql
+      - 3308:3306
 
   adminer:
     image: adminer
