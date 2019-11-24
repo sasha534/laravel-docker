@@ -1,6 +1,18 @@
 # Версия docker-compose
-version: '3'
+version: '3.2'
 # Список наших сервисов (контейнеров)
+
+networks:
+  backend-network:
+    driver: bridge
+  frontend-network:
+    driver: bridge
+
+volumes:
+  redis-data:
+  pg-data:
+  home-dir:
+
 services:
   web:
     build: ./web
@@ -32,3 +44,27 @@ services:
       - ${APP_PATH_HOST}:${APP_PATH_CONTAINER}
     working_dir: ${APP_PATH_CONTAINER}
     command: composer install
+
+  postgres:
+    image: postgres:9.6.10-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: pg-db-name
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pg-data:/var/lib/postgresql/data:rw
+    ports:
+      - 15432:5432 # Port 15432 for connecting from localhost using, for example, data-grip
+
+  redis:
+    image: redis:4.0.11-alpine
+    restart: always
+    command: redis-server
+    volumes:
+      - redis-data:/data:rw
+    ports:
+      - 16379:6379 # Port 16379 for connecting from localhost
+    networks:
+      - backend-network
+
